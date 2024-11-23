@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { act, useEffect, useState } from 'react'
 import './App.css'
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -17,15 +17,37 @@ function App() {
   const [news, setNews] = useState([])
   const [topic, setTopic] = useState('')
 
-  const [fullscreen, setFullscreen] = useState('xxl-down'); // Set the desired breakpoint directly
-  const [show, setShow] = useState(false);
 
-  function handleShow() {
-    setShow(true);
-  }
+
+  const [show, setShow] = useState(false);
+  const [activeNews, setActiveNews] = useState(null);
+
+  const handleClose = () => {
+    setActiveNews(null);
+  };
+  const handleShow = (newsItem) => {
+   
+    setActiveNews(newsItem);
+  };
+
+
+
 
   // https://newsapi.org/v2/everything?q=${search}&apiKey=${API_KEY}
   // https://newsapi.org/v2/everything?q=sports&apiKey=${API_KEY}
+
+  useEffect(()=>{
+    getVideo()
+  },[])
+
+  const getVideo=async()=>{
+    try{
+      const { data } = await axios.get(`https://newsapi.org/v2/everything?q=${search}&apiKey=${API_KEY}`)
+      setNews(data.articles)
+    }catch(err){
+      console.log(err)
+    }
+  }
 
 
 
@@ -45,13 +67,19 @@ function App() {
     try {
       const { data } = await axios.get(`https://newsapi.org/v2/everything?q=${to}&apiKey=${API_KEY}`)
       console.log(data.articles)
+     
       // if(data.articles.content != [Rwm])
       setNews(data.articles)
+      setColor()
     } catch (err) {
       console.log(err)
     }
-  }
+  } 
 
+
+  const setColor=()=>{
+    style.button.color='red'
+  }
 
 
   return (
@@ -62,7 +90,7 @@ function App() {
       <div className='container-fluid'>
         <Row>
           <Row>
-            <Navbar className="bg-dark text-light align-items-center justify-content-center p-3">
+            <Navbar className=" text-light align-items-center justify-content-center p-3" style={{backgroundColor:'#89A8B2'}}>
               <Col sm={12} lg={6}>
                 <Form >
                   <h2 style={{ fontFamily: 'fantasy' }}>NewsLatest</h2>
@@ -89,10 +117,10 @@ function App() {
           </Row>
 
           <Row className='p-2'>
-            <Col lg={2} className='border border-light p-2 '>
+            <Col lg={2} className='border border-3 border-dark p-2 ' style={{backgroundColor:'#B3C8CF'}}>
               <div className='d-flex flex-column align-items-center p-2'>
                 {/* <h4>Other News</h4> */}
-                <Button onClick={() => handleSports('health')} className='m-2 w-100' variant="outline-info">Health</Button>
+                <Button onClick={() => handleSports('health')} className='m-2 w-100' variant="outline-light">Health</Button>
                 <Button onClick={() => handleSports('sports')} className='m-2 w-100' variant="outline-dark">Sports</Button>
                 <Button onClick={() => handleSports('technology')} className='m-2 w-100' variant="outline-dark">Technology</Button>
                 <Button onClick={() => handleSports('business')} className='m-2 w-100' variant="outline-dark">Business</Button>
@@ -108,27 +136,20 @@ function App() {
                   news.length > 0 ?
                     news?.map(newsDay =>
                       <Col lg={4} sm={12} >
-                        <Card className='m-2 border-light bg-light-subtle shadow border-3' style={{ width: '16rem', height: '30rem' }}>
+                        <Card onClick={() => handleShow(newsDay)} className='m-2 border-light shadow border-3' style={{ width: '16rem', height: '30rem', backgroundColor:'#E5E1DA' }}>
                           <Card.Img className='img-fluid' variant="top" src={newsDay.urlToImage} style={{ height: '200px' }} />
                           <Card.Body>
-                            <Card.Title>{newsDay.title}</Card.Title>
+                            <Card.Title style={{color:'#555352'}}>{newsDay.title}</Card.Title>
                             <Card.Text>
                               {newsDay.publishedAt
                               }
                             </Card.Text>
-                            <Button variant="primary" className="me-2 mb-2" onClick={handleShow}>See More</Button>
+                            <Button variant="primary" className="me-2 mb-2" onClick={() => handleShow(newsDay)}>See More</Button>
                           </Card.Body>
                         </Card>
 
 
-                        <Modal show={show} fullscreen={fullscreen} onHide={() => setShow(false)}>
-                          <Modal.Header closeButton>
-                            <Modal.Title>{newsDay.title}</Modal.Title>
-                          </Modal.Header>
-                          <Modal.Body>{newsDay.description}</Modal.Body>
-                          <Modal.Body>{newsDay.content}</Modal.Body>
-                          <Modal.Body>{newsDay.author}</Modal.Body>
-                        </Modal>
+
 
                       </Col>
                     )
@@ -140,6 +161,23 @@ function App() {
           </Row>
         </Row>
 
+        {
+          activeNews && (
+            <Modal show={activeNews} size="lg" onHide={handleClose}>
+              <Modal.Header closeButton>
+                <Modal.Title><h1>{activeNews.title} </h1> </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <h3>{activeNews.author}</h3> <br />
+                <h4>{activeNews.content}</h4>
+                
+                <p>{activeNews.description}</p>
+              </Modal.Body>
+              
+            </Modal>
+
+          )
+        }
       </div>
 
     </>
