@@ -90,7 +90,7 @@ function App() {
       <div className='container-fluid'>
         <Row>
           <Row>
-            <Navbar className="d-flex flex-column flex-md-row text-light text-center align-items-center justify-content-center p-3" style={{ backgroundColor: '#89A8B2' }}>
+            <Navbar className="d-flex flex-column flex-md-row text-light text-center align-items-center justify-content-center p-3 w-100" style={{ backgroundColor: '#89A8B2' }}>
               <Col sm={12} lg={6}>
                 
                   <h2 style={{ fontFamily: 'fantasy' }}>NewsApp</h2>
@@ -120,6 +120,7 @@ function App() {
               </Form>
             </Navbar>
           </Row>
+          
 
           <Row className='p-2'>
             <Col lg={2} sm={12} className='border border-3 border-info rounded p-2 ' style={{ backgroundColor: '#B3C8CF' }}>
@@ -176,8 +177,8 @@ function App() {
 
                 {
                   news.length > 0 ?
-                    news?.map(newsDay =>
-                      <Col lg={4} sm={12} >
+                    news?.map((newsDay,index) =>
+                      <Col lg={4} sm={12} key={index}>
                         <Card onClick={() => handleShow(newsDay)} className='m-2 p-1 border-teritary shadow border-3' style={{ width: '18rem', height: '30rem', backgroundColor: '#E5E1DA' }}>
                           <Card.Img className='img-fluid' variant="top" src={newsDay.urlToImage} style={{ height: '200px' }} />
                           <Card.Body>
